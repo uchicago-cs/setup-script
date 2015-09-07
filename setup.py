@@ -36,9 +36,8 @@ use_setuptools(version="18.1")
 from setuptools import setup, find_packages
 import sys
 
-sys.path.insert(0, './src')
-from uchicago_cs_setup_script import RELEASE
-
+VERSION = "0.9"
+RELEASE = "0.9.0"
 
 eps = ['cs-setup-script = uchicago_cs_setup_script:cmd.main']
 

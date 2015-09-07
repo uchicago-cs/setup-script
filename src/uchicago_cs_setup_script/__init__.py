@@ -13,9 +13,6 @@ import stat
 import git
 import time
 
-VERSION = "0.9"
-RELEASE = "0.9.0"
-
 SYSTEM_CONFIG_DIR = "/etc/cs-setup/conf.d"
 FILENAME_TEMPLATE = "{}.yml"
 
