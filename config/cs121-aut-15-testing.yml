@@ -3,6 +3,6 @@ course-name: Computer Science with Applications I
 quarter: Autumn
 year: 2015
 gitlab-hostname: mit.cs.uchicago.edu
-gitlab-ssl: false
+gitlab-ssl: true
 gitlab-group: cs121-aut-15-testing
 gitlab-upstream-repo: cs121-aut-15-testing
