@@ -32,7 +32,7 @@
 # -------------------------------------------------------------------------- #
 
 from ez_setup import use_setuptools
-use_setuptools(version="18.1")
+use_setuptools(version="3.3")
 from setuptools import setup, find_packages
 import sys
 
