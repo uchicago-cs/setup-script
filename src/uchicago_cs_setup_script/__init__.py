@@ -12,6 +12,7 @@ from gitlab.exceptions import HttpError
 import stat
 import git
 import time
+import configparser
 
 SYSTEM_CONFIG_DIR = "/etc/cs-setup/conf.d"
 FILENAME_TEMPLATE = "{}.yml"
@@ -272,7 +273,7 @@ def print_git_error(gce):
     print("-----------------")
     print(gce.stderr)
 
-def create_local_repo(repo_path, repo_url, upstream_repo_url, skip_push):
+def create_local_repo(repo_path, repo_url, upstream_repo_url, name, email, skip_push):
     try:
         repo = git.Repo.clone_from(repo_url, repo_path)
     except git.exc.GitCommandError as gce:
@@ -280,6 +281,23 @@ def create_local_repo(repo_path, repo_url, upstream_repo_url, skip_push):
         print_git_error(gce)
         exit(1)
 
+    cr_global = repo.config_reader(config_level="global")    
+    cw_global = repo.config_writer(config_level="global")
+    cw =  repo.config_writer()
+    
+    if not cr_global.has_section("user"):
+        cw_global.set_value("user", "name", name)
+        cw_global.set_value("user", "email", email)
+    else:
+        cw.set_value("user", "name", name)
+        cw.set_value("user", "email", email)        
+            
+    if not cr_global.has_option("push", "default"):
+        cw_global.set_value("push", "default", "simple")
+          
+    cw.release()
+    cw_global.release()  
+    
     origin = repo.remotes[0]
 
     try:
@@ -403,9 +421,13 @@ def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, skip_ssl
     #
     # Create local repository
     #
-
+    
     repo_path = get_local_repo_path(config["course-id"], gitlab_repo["name"], local_repo_path)
 
-    create_local_repo(repo_path, gitlab_repo["ssh_url_to_repo"], gitlab_upstream_repo["ssh_url_to_repo"], skip_push)      
+    gitlab_user = gitlab.currentuser()
+    name = gitlab_user["name"]
+    email = gitlab_user["email"]
+
+    create_local_repo(repo_path, gitlab_repo["ssh_url_to_repo"], gitlab_upstream_repo["ssh_url_to_repo"], name, email, skip_push)      
 
     print("Your git repository has been created in %s" % repo_path)
