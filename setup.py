@@ -37,7 +37,7 @@ from setuptools import setup, find_packages
 import sys
 
 VERSION = "0.9"
-RELEASE = "0.9.0"
+RELEASE = "0.9.1"
 
 eps = ['cs-setup-script = uchicago_cs_setup_script:cmd.main']
 
