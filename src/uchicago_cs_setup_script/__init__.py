@@ -13,9 +13,12 @@ import stat
 import git
 import time
 import configparser
+import subprocess
+from requests.exceptions import RequestException
 
 SYSTEM_CONFIG_DIR = "/etc/cs-setup/conf.d"
 FILENAME_TEMPLATE = "{}.yml"
+GITHUB_CONFIG_URL = "https://raw.githubusercontent.com/uchicago-cs/setup-script/master/config/{}.yml"
 
 VERBOSE = False
 
@@ -26,7 +29,9 @@ CONFIG_FIELDS = ["course-id",
                  "gitlab-hostname",
                  "gitlab-ssl",
                  "gitlab-group",
-                 "gitlab-upstream-repo"]
+                 "gitlab-upstream-repo",
+                 "chisubmit-init",
+                 "chisubmit-course"]
 
 SSH_DIR = os.path.expanduser("~/.ssh")
 SSH_PRV_KEY = SSH_DIR + "/id_rsa"
@@ -44,6 +49,17 @@ def log(msg):
     if VERBOSE:
         print("LOG: " + msg)    
 
+def load_config_file(file_or_string, source):
+    config = yaml.load(file_or_string)
+    if not isinstance(config, dict):
+        error("File {} is not a valid configuration file".format(source))
+    else:
+        keys = config.keys()
+        for k in keys:
+            if k not in CONFIG_FIELDS:
+                error("File {} contains an invalid field: {}".format(source, k))
+    return config
+
 def load_configuration(course_id, path = None):
     '''
     Load configuration for a given course. First, try the system-wide
@@ -60,18 +76,30 @@ def load_configuration(course_id, path = None):
     for fname in files:
         if os.path.exists(fname):
             with open(fname) as f:
-                config = yaml.load(f)
-                if not isinstance(config, dict):
-                    error("File {} is not a valid configuration file".format(fname))
-                else:
-                    keys = config.keys()
-                    for k in keys:
-                        if k not in CONFIG_FIELDS:
-                            error("File {} contains an invalid field: {}".format(fname, k))
-            
+                config = load_config_file(f, fname)
+
     if config is None:
-        # TODO: Fetch from GitHub
-        pass
+        try:
+            url = GITHUB_CONFIG_URL.format(course_id)
+            r = requests.get(url)
+        except ConnectionError as ce:
+            error("Could not connect to {}".format(ce.request.url))
+        except RequestException as re:
+            error_msg  = "Unexpected error when fetching configuration file: {}\n".format(re)
+            error_msg += "URL: {}".format(ce.request.url)
+            error(error_msg)
+        
+        if r.status_code == 200:
+            config = load_config_file(r.text, url)
+        elif r.status_code == 404:
+            log("Not found: {}".format(url))
+            config = None
+        else:
+            error_msg  = "Unexpected error when fetching configuration file: {}\n"
+            error_msg += "URL: {}\n".format(url)
+            error_msg += "Status code: {}\n".format(r.status_code)
+            error_msg += "Reason: {}\n".format(r.reason)
+            error(error_msg)
             
     if config is None:
         error("Could not find configuration for course '{}'".format(course_id))
@@ -321,6 +349,20 @@ def create_local_repo(repo_path, repo_url, upstream_repo_url, name, email, skip_
         print("ERROR: Could not pull from upstream repository") 
         print_git_error(gce)
         exit(1)
+        
+def cmd_error(cmd, p, rc = None):
+    print("ERROR while running this command:\n\n{}\n\n".format(" ".join(cmd)))
+    if rc is None:
+        print("Command timed out before returning.")
+    else:
+        print("Return code: {}".format(rc))
+    print("\nStandard Output")
+    print("---------------")
+    print(p.stdout.read().decode("utf-8") )
+    print("\nStandard Error")
+    print("---------------")
+    print(p.stderr.read().decode("utf-8") )
+        
 
 @click.command(name="cs-setup-script")
 @click.argument('course_id')
@@ -412,6 +454,8 @@ def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, skip_ssl
     except IOError as ioe:
         error("Error reading your SSH public key: " + ioe.message)
 
+
+    print("Setting up your Git repository...")
     add_ssh_key_to_gitlab(gitlab, ssh_pubkey)
 
     # We need to add an artificial delay because, apparently, the SSH key is
@@ -431,3 +475,40 @@ def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, skip_ssl
     create_local_repo(repo_path, gitlab_repo["ssh_url_to_repo"], gitlab_upstream_repo["ssh_url_to_repo"], name, email, skip_push)      
 
     print("Your git repository has been created in %s" % repo_path)
+    
+    #
+    # Run chisubmit init
+    #
+    if config.get("chisubmit-init", False):
+        chisubmit_course = config["chisubmit-course"]
+        
+        try:
+            import chisubmit
+        except ImportError:
+            error("Cannot run 'chisubmit init'. chisubmit is not installed on this machine.")
+        
+        print("")
+        cmd = ["chisubmit", "--work-dir", repo_path,
+                                           "--config-dir", repo_path + "/.chisubmit",
+                                           "init",
+                                           "--username", username,
+                                           "--password", password,
+                                           # TODO: Use Git credentials obtained earlier
+                                           "--git-username", username,
+                                           "--git-password", password,
+                                           chisubmit_course
+                                           ]
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        print("Setting up chisubmit...")
+        try:
+            rc = p.wait(5)
+        except subprocess.TimeoutExpired:
+            cmd_error(cmd, p)
+        
+        if rc != 0:
+            print("chisubmit has been set up. You can use chisubmit commands inside {}\n".format(repo_path))
+        else:
+            cmd_error(cmd, p, rc)
+        
+        
