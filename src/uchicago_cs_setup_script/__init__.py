@@ -350,6 +350,20 @@ def create_local_repo(repo_path, repo_url, upstream_repo_url, name, email, skip_
         print_git_error(gce)
         exit(1)
         
+
+def construct_chisubmit_command(repo_path, username, password, chisubmit_course):
+    return ["chisubmit", "--work-dir", repo_path,
+                                           "--config-dir", repo_path + "/.chisubmit",
+                                           "init",
+                                           "--username", username,
+                                           "--password", password,
+                                           # TODO: Use Git credentials obtained earlier
+                                           "--git-username", username,
+                                           "--git-password", password,
+                                           chisubmit_course
+                                           ]
+        
+        
 def cmd_error(cmd, p, rc = None):
     print("ERROR while running this command:\n\n{}\n\n".format(" ".join(cmd)))
     if rc is None:
@@ -482,33 +496,25 @@ def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, skip_ssl
     if config.get("chisubmit-init", False):
         chisubmit_course = config["chisubmit-course"]
         
-        try:
-            import chisubmit
-        except ImportError:
-            error("Cannot run 'chisubmit init'. chisubmit is not installed on this machine.")
-        
         print("")
-        cmd = ["chisubmit", "--work-dir", repo_path,
-                                           "--config-dir", repo_path + "/.chisubmit",
-                                           "init",
-                                           "--username", username,
-                                           "--password", password,
-                                           # TODO: Use Git credentials obtained earlier
-                                           "--git-username", username,
-                                           "--git-password", password,
-                                           chisubmit_course
-                                           ]
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = construct_chisubmit_command(repo_path, username, password, chisubmit_course)
+        
+        cmd_redacted = construct_chisubmit_command(repo_path, username, "...", chisubmit_course)
+        
+        try:
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except OSError:
+            error("Could not run chisubmit.")
         
         print("Setting up chisubmit...")
         try:
             rc = p.wait(5)
         except subprocess.TimeoutExpired:
-            cmd_error(cmd, p)
+            cmd_error(cmd_redacted, p)
         
         if rc != 0:
             print("chisubmit has been set up. You can use chisubmit commands inside {}\n".format(repo_path))
         else:
-            cmd_error(cmd, p, rc)
+            cmd_error(cmd_redacted, p, rc)
         
         
