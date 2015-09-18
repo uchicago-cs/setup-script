@@ -513,7 +513,7 @@ def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, skip_ssl
         except subprocess.TimeoutExpired:
             cmd_error(cmd_redacted, p)
         
-        if rc != 0:
+        if rc == 0:
             print("chisubmit has been set up. You can use chisubmit commands inside {}\n".format(repo_path))
         else:
             cmd_error(cmd_redacted, p, rc)
