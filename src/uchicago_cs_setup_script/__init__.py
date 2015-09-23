@@ -142,15 +142,26 @@ def get_gitlab_repo_data(gitlab, gitlab_group_name, gitlab_upstream_repo_name, r
     except HttpError as he:
         error("Unexpected error while accessing the upstream repository on the Git server (Reason: {})".format(he))
     
+    gitlab_projects = {}
     try:
-        gitlab_projects = gitlab.getprojects()
-        if gitlab_projects == False:
-            error("Unexpected error while accessing the repositories on the Git server. Unknown reason.")
+        page = 1
+        done = False
+        while not done:
+            ps = gitlab.getprojects(page=page, per_page=100)
+            if ps == False:
+                error("Unexpected error while accessing the repositories on the Git server. Unknown reason.")
+                        
+            for p in ps:
+                if p["namespace"]["path"] == gitlab_group_name and p["path"] != gitlab_upstream_repo_name:
+                    gitlab_projects[p["path"]] = p
+            
+            if len(ps) < 100:
+                done = True
+            else:
+                page += 1
     except HttpError as he:
         error("Unexpected error while accessing the repositories on the Git server (Reason: {})".format(he))
-        
-    gitlab_projects = {p["path"]:p for p in gitlab_projects if p["namespace"]["path"] == gitlab_group_name and p["path"] != gitlab_upstream_repo_name}
-            
+           
     if repo is not None:
         if not repo in gitlab_projects:
             error("Could not access repository '{}'. It either doesn't exist or you do not have access to it.".format(repo))
