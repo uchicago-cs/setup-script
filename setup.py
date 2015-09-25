@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -------------------------------------------------------------------------- #
-# Copyright (c) 2015, Borja Sotomayor
+# Copyright (c) 2015, University of Chicago
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,10 @@ use_setuptools(version="3.3")
 from setuptools import setup, find_packages
 import sys
 
-VERSION = "0.9"
-RELEASE = "0.9.3"
+sys.path.insert(0, './src')
+from uchicago_cs_setup_script import RELEASE
 
-eps = ['cs-setup-script = uchicago_cs_setup_script:cmd.main']
+eps = ['cs-setup-script = uchicago_cs_setup_script.script:cmd.main']
 
 setup(name='uchicago-cs-setup-script',
       version=RELEASE,
