@@ -8,3 +8,5 @@ gitlab-group: cs121-aut-15-testing
 gitlab-upstream-repo: cs121-aut-15-testing
 chisubmit-init: true
 chisubmit-course: cs121-aut-15-testing
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
