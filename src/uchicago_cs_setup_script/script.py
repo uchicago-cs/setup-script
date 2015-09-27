@@ -472,11 +472,15 @@ def add_bash_rc(config, repo_path):
 @click.option('--config-dir', type=str)
 @click.option('--repo', type=str)
 @click.option('--local-repo-path', type=str)
+@click.option('--timeout', type=int, default=15)
 @click.option('--skip-ssl-verify', is_flag=True)
 @click.option('--skip-push', is_flag=True)
 @click.option('--verbose', '-v', is_flag=True)
 @click.version_option(version=RELEASE)
-def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, skip_ssl_verify, skip_push, verbose):
+def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, timeout, skip_ssl_verify, skip_push, verbose):
+    
+    if timeout == 0:
+        timeout = None
     
     #
     # Load configuration
@@ -596,7 +600,7 @@ def cmd(course_id, cnetid, password, config_dir, repo, local_repo_path, skip_ssl
         
         print("Setting up chisubmit...")
         try:
-            rc = p.wait(15)
+            rc = p.wait(timeout)
         except subprocess.TimeoutExpired:
             cmd_error(cmd_redacted, p)
         
