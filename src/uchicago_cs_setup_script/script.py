@@ -196,6 +196,10 @@ def get_gitlab_repo_data(gitlab, gitlab_group_name, gitlab_upstream_repo_name, r
         else:
             gitlab_project = gitlab_projects[repo]
     else:
+        if len(gitlab_projects) == 0:
+            print()
+            error("It seems like you do not have access to any Git repositories. Please check with your instructor.")
+        
         gitlab_project_names = sorted(gitlab_projects.keys())
         
         print()
