@@ -1,0 +1,12 @@
+course-id: cs122-win-16
+course-name: Computer Science with Applications II
+quarter: Winter
+year: 2016
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: cs122-win-16
+gitlab-upstream-repo: cs122-win-16
+chisubmit-init: true
+chisubmit-course: cs122-win-16
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
