@@ -1,0 +1,12 @@
+course-id: cs121-aut-16-testing
+course-name: Computer Science with Applications I
+quarter: Autumn
+year: 2016
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: cs121-aut-16-testing
+gitlab-upstream-repo: cs121-aut-16-testing
+chisubmit-init: true
+chisubmit-course: cs121-aut-16-testing
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
