@@ -1,0 +1,12 @@
+course-id: cs123-spr-17
+course-name: Computer Science with Applications III
+quarter: Spring
+year: 2017
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: cs123-spr-17
+gitlab-upstream-repo: cs123-spr-17
+chisubmit-init: true
+chisubmit-course: cs123-spr-17
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
