@@ -169,33 +169,36 @@ def get_gitlab_repo_data(gitlab, gitlab_group_name, gitlab_upstream_repo_name, r
             error("The upstream repository '{}' does not exist in the Git server".format(upstream_path))
     except HttpError as he:
         error("Unexpected error while accessing the upstream repository on the Git server (Reason: {})".format(he))
-    
-    gitlab_projects = {}
-    try:
-        page = 1
-        done = False
-        while not done:
-            ps = gitlab.getprojects(page=page, per_page=100)
-            if ps == False:
-                error("Unexpected error while accessing the repositories on the Git server. Unknown reason.")
-                        
-            for p in ps:
-                if p["namespace"]["path"] == gitlab_group_name and p["path"] != gitlab_upstream_repo_name:
-                    gitlab_projects[p["path"]] = p
-            
-            if len(ps) < 100:
-                done = True
-            else:
-                page += 1
-    except HttpError as he:
-        error("Unexpected error while accessing the repositories on the Git server (Reason: {})".format(he))
-           
+
     if repo is not None:
-        if not repo in gitlab_projects:
-            error("Could not access repository '{}'. It either doesn't exist or you do not have access to it.".format(repo))
-        else:
-            gitlab_project = gitlab_projects[repo]
+        repo_path = "{}/{}".format(gitlab_group_name, repo)
+        try:
+            gitlab_project = gitlab.getproject(repo_path)
+            if gitlab_project == False:
+                error("Could not access repository '{}'. It either doesn't exist or you do not have access to it.".format(repo))
+        except HttpError as he:
+            error("Unexpected error while accessing repository '{}' on the Git server (Reason: {})".format(repo, he))
     else:
+        gitlab_projects = {}
+        try:
+            page = 1
+            done = False
+            while not done:
+                ps = gitlab.getprojects(page=page, per_page=100)
+                if ps == False:
+                    error("Unexpected error while accessing the repositories on the Git server. Unknown reason.")
+                            
+                for p in ps:
+                    if p["namespace"]["path"] == gitlab_group_name and p["path"] != gitlab_upstream_repo_name:
+                        gitlab_projects[p["path"]] = p
+                
+                if len(ps) < 100:
+                    done = True
+                else:
+                    page += 1
+        except HttpError as he:
+            error("Unexpected error while accessing the repositories on the Git server (Reason: {})".format(he))
+        
         if len(gitlab_projects) == 0:
             print()
             error("It seems like you do not have access to any Git repositories. Please check with your instructor.")
