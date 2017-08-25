@@ -1,0 +1,12 @@
+course-id: cmsc12100-aut-17
+course-name: Computer Science with Applications I
+quarter: Autumn
+year: 2017
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: cmsc12100-aut-17
+gitlab-upstream-repo: cmsc12100-aut-17
+chisubmit-init: true
+chisubmit-course: cmsc12100-aut-17
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
