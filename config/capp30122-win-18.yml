@@ -1,0 +1,12 @@
+course-id: capp30122-win-18
+course-name: Computer Science with Applications II
+quarter: Winter
+year: 2018
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: capp30122-win-18
+gitlab-upstream-repo: capp30122-win-18
+chisubmit-init: true
+chisubmit-course: capp30122-win-18
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
