@@ -241,19 +241,13 @@ def generate_ssh_keys(username):
     ssh_keygen_cmd = "ssh-keygen -t rsa -C \"{}\" -f ~/.ssh/id_rsa".format(label)
 
     try:
-        from Crypto import version_info
-        from Crypto.PublicKey import RSA
+        from Cryptodome import version_info
+        from Cryptodome.PublicKey import RSA
     except ImportError:
-        error_msg  = "Your computer does not have the 'pycrypto' library necessary to\n"
+        error_msg  = "Your computer does not have the 'pycryptodome' library necessary to\n"
         error_msg += "run this script. Try generating your SSH keys manually by running this:\n\n"
         error_msg += "    {}\n\n".format(ssh_keygen_cmd)
-        error(error_msg)
-
-    if version_info[0] < 2 or (version_info[0] == 2 and version_info[1] < 6):
-        error_msg  = "Your computer has an old version of the 'pycrypto' library necessary to\n"
-        error_msg += "run this script (version 2.6 or higher is required). Try generating your\n"
-        error_msg += "SSH keys manually by running this:\n\n"
-        error_msg += "    {}\n\n".format(ssh_keygen_cmd)
+        error_msg += "Once you have done this, re-run the setup script.\n\n"
         error(error_msg)
 
     new_key = RSA.generate(2048)
