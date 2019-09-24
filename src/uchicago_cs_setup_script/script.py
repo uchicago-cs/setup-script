@@ -78,7 +78,7 @@ def log(msg):
         print("LOG: " + msg)    
 
 def load_config_file(file_or_string, source):
-    config = yaml.load(file_or_string)
+    config = yaml.load(file_or_string, Loader=yaml.FullLoader)
     if not isinstance(config, dict):
         error("File {} is not a valid configuration file".format(source))
     else:
