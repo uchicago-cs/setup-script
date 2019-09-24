@@ -57,7 +57,7 @@ setup(name='uchicago-cs-setup-script',
                            "click >= 5.1" ],
       
       extras_require = {
-                         "ssh" : ["pycrypto >= 2.6.1"] 
+                         "ssh" : ["pycryptodomex >= 3.9.0"] 
                        },      
 
       setup_requires = [ "setuptools_git >= 1.0" ],
