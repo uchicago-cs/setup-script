@@ -53,12 +53,11 @@ setup(name='uchicago-cs-setup-script',
       install_requires = [ "requests >= 2.7.0",
                            "GitPython >= 1.0.1", 
                            "pyapi-gitlab >= 7.8.4",
-                           "pyyaml >= 3.11",                           
-                           "click >= 5.1" ],
+                           "pyyaml >= 5.1.2",                           
+                           "click >= 5.1",
+                           "pycryptodomex >= 3.9.0"],
       
-      extras_require = {
-                         "ssh" : ["pycryptodomex >= 3.9.0"] 
-                       },      
+      extras_require = { },      
 
       setup_requires = [ "setuptools_git >= 1.0" ],
 
