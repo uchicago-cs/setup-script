@@ -1,0 +1,12 @@
+course-id: cmsc12300-spr-20
+course-name: Computer Science with Applications III
+quarter: Spring
+year: 2020
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: cmsc12300-spr-20
+gitlab-upstream-repo: cmsc12300-spr-20
+chisubmit-init: true
+chisubmit-course: cmsc12300-spr-20
+bashrc-lines:
+ - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
