@@ -1,0 +1,12 @@
+course-id: capp30121-aut-20
+course-name: Computer Science with Applications I
+quarter: Autumn
+year: 2020
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: capp30121-aut-20
+gitlab-upstream-repo: capp30121-aut-20
+chisubmit-init: true
+chisubmit-course: capp30121-aut-20
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
