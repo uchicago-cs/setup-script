@@ -10,3 +10,4 @@ chisubmit-init: true
 chisubmit-course: cmsc12100-aut-20
 bashrc-lines:
   - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
+  - export EDITOR=nano
