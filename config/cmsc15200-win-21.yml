@@ -1,0 +1,12 @@
+course-id: cmsc15200-win-21
+course-name: Introduction to Computer Science II
+quarter: Winter
+year: 2021
+gitlab-hostname: mit.cs.uchicago.edu
+gitlab-ssl: true
+gitlab-group: cmsc15200-win-21
+gitlab-upstream-repo: cmsc15200-win-21
+chisubmit-init: true
+chisubmit-course: cmsc15200-win-21
+bashrc-lines:
+  - export PYTHONPATH={repo_path}/lib:$PYTHONPATH
